@@ -156,17 +156,17 @@
 			foreach ($paths as $path) {
 
 				if (!isset($result[$path['field']])) {
-
 					$result[$path['field']] =	['status' => 0,'value' => '', 'error_margin'=> 1];
-
 				}
 				else if ($result[$path['field']]['status'] == 3) {
-
 					//if marked with wrong dont search next path
 					continue;
-
 				}
-
+				else if ($result[$path['field']]['status'] == 2) {
+					//if a next char from field reset status
+					$result[$path['field']]['status'] = 0;
+				}
+				
 				foreach ($path['marks'] as $mark) {
 
 					if ($result[$path['field']]['status'] == 0) {
