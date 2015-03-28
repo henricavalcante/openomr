@@ -3,4 +3,5 @@ php:
   - 5.4
   - 5.5
 before_script:
-  - pecl install imagick
+  - printf "\n" | pecl install imagick
+  - echo "extension=imagick.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
