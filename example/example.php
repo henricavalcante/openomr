@@ -124,6 +124,6 @@ require("../openomr.php");
 
 	//$result = $omr->getMatrixFromImage();
 	
-	print_r($result);
+	print_r($result->ID);
 	
 	
