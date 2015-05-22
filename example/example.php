@@ -1,9 +1,8 @@
 <?php
 
-require("../openomr.php");
+require("../src/OpenOMR.php");
 
-
-	$omr = OpenOMR::getInstance('openomr.jpg');
+	$omr = \OpenOMR\OpenOMR::getInstance('openomr.jpg');
 
 	$pathMarks = [
 		['field' => 'id','marks' =>[[19, 29, 1],[20, 29, 2],[21, 29, 3],[22, 29, 4],[23, 29, 5],[24, 29, 6],[25, 29, 7],[26, 29, 8],[27, 29, 9],[28, 29, 0],]],
@@ -124,6 +123,6 @@ require("../openomr.php");
 
 	//$result = $omr->getMatrixFromImage();
 	
-	print_r($result->ID);
+	print_r($result);
 	
 	

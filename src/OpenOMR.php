@@ -1,6 +1,9 @@
 <?php
 namespace OpenOMR;
 
+use Imagick;
+use ImagickPixel;
+
 class OpenOMR
 {
     const EDGE = 4;
