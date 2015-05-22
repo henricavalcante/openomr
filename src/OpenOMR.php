@@ -24,10 +24,8 @@ class OpenOMR
 
     public function __construct($path)
     {
-
-        //initialize object
         $this->img = new Imagick();
-        $this->readImage($path);
+        $this->img->readImage($path);
 
         if (self::DEBUG) {
             $this->debugFolder = getdate()[0] . '/';
@@ -46,11 +44,6 @@ class OpenOMR
         if (self::DEBUG) {
             $this->img->writeImage($this->debugFolder . 'removeEdges.PNG');
         }
-    }
-
-    private function readImage($path)
-    {
-        $this->img->readImage($path);
     }
 
     private function removeColors()
