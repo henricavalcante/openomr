@@ -7,14 +7,10 @@ use ImagickPixel;
 
 class OpenOMR
 {
-    const EDGE = 4;
     const DEBUG = 0;
     const ERROR_MARGIN = 0.5;
 
     private $debugFolder;
-
-    private $matrixXLength;
-    private $matrixYLength;
 
     private $img;
     private $imgSizeW;
@@ -23,15 +19,22 @@ class OpenOMR
     private $imgCellSizeH;
     private $imgCellCompareSizeW;
     private $imgCellCompareSizeH;
+    private $imgCellOffset;
+    private $matrixXLength;
+    private $matrixYLength;
 
-    public function __construct($path)
+    public function __construct($imgPath, $matrixXLength = null, $matrixYLength = null, $imgCellOffset = null)
     {
         if (!extension_loaded('imagick')) {
             throw new Exception\ImagickExtensionNotFoundException('Imagick extension is not loaded.');
         }
 
         $this->img = new Imagick();
-        $this->img->readImage($path);
+        $this->img->readImage($imgPath);
+
+        $this->setMatrixXLength($matrixXLength);
+        $this->setMatrixYLength($matrixYLength);
+        $this->setImgCellOffset($imgCellOffset);
     }
 
     public function setMatrixYLength($length)
@@ -42,6 +45,11 @@ class OpenOMR
     public function setMatrixXLength($length)
     {
         $this->matrixXLength = $length;
+    }
+
+    public function setImgCellOffset($offset)
+    {
+        $this->imgCellOffset = $offset;
     }
 
     public function getMarksFromPaths($paths)
@@ -173,8 +181,8 @@ class OpenOMR
         $this->imgCellSizeW = $this->imgSizeW / $this->matrixXLength;
         $this->imgCellSizeH = $this->imgSizeH / $this->matrixYLength;
 
-        $this->imgCellCompareSizeW = $this->imgCellSizeW - (self::EDGE * 2);
-        $this->imgCellCompareSizeH = $this->imgCellSizeH - (self::EDGE * 2);
+        $this->imgCellCompareSizeW = $this->imgCellSizeW - ($this->imgCellOffset * 2);
+        $this->imgCellCompareSizeH = $this->imgCellSizeH - ($this->imgCellOffset * 2);
 
         if (self::DEBUG) {
             print_r($this);
@@ -186,8 +194,8 @@ class OpenOMR
     {
         $sizeW = $this->imgCellCompareSizeW;
         $sizeH = $this->imgCellCompareSizeH;
-        $pX = ($col * $this->imgCellSizeW) + self::EDGE;
-        $pY = ($row * $this->imgCellSizeW) + self::EDGE;
+        $pX = ($col * $this->imgCellSizeW) + $this->imgCellOffset;
+        $pY = ($row * $this->imgCellSizeW) + $this->imgCellOffset;
 
         if (self::DEBUG) {
             echo "\n" . $col . " - " . $row . " - " . $pX . " - " . $pY;
