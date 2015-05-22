@@ -4,6 +4,7 @@ namespace OpenOMR;
 use OpenOMR\Exception;
 use Imagick;
 use ImagickPixel;
+use ImagickException;
 
 class OpenOMR
 {
@@ -29,12 +30,21 @@ class OpenOMR
             throw new Exception\ImagickExtensionNotFoundException('Imagick extension is not loaded.');
         }
 
-        $this->img = new Imagick();
-        $this->img->readImage($imgPath);
+        $this->createImageFromPath($imgPath);
 
         $this->setMatrixXLength($matrixXLength);
         $this->setMatrixYLength($matrixYLength);
         $this->setImgCellOffset($imgCellOffset);
+    }
+
+    private function createImageFromPath($imgPath)
+    {
+        try {
+            $this->img = new Imagick();
+            $this->img->readImage($imgPath);
+        } catch (ImagickException $e) {
+            throw new Exception\InvalidImgPathException('It was not possible to read the image from path informed.');
+        }
     }
 
     public function setMatrixYLength($length)
