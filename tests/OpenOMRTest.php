@@ -1,12 +1,13 @@
 <?php
 require("src/OpenOMR.php");
 require("src/Exception/ImagickExtensionNotFoundException.php");
+require("src/Exception/InvalidImgPathException.php");
 
 class OpenOMRTest extends PHPUnit_Framework_TestCase
 {
     public function testIfImgCanBeRead()
     {
-        $omr = new \OpenOMR\OpenOMR('example/openomr.jpg');
+        $omr = new \OpenOMR\OpenOMR('example/openomr.jpg', 38, 54, 4);
 
         $pathMarks = [
             [
