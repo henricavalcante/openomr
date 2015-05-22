@@ -113,45 +113,6 @@ class OpenOMR
         return $this->img->getImageRegion($sizeW, $sizeH, $pX, $pY);
     }
 
-    public function getMatrixFromImage()
-    {
-
-        // create reference block pattern
-        $imageToCompare = new Imagick();
-        $imageToCompare->newImage($this->imgCelCompareSizeW, $this->imgCelCompareSizeH, new ImagickPixel('black'));
-
-        $matrixResult = [];
-
-        for ($i = 0; $i < self::MATRIXROWS; $i++) {
-
-            for ($j = 0; $j < self::MATRIXCOLS; $j++) {
-                if (!isset($matrixResult[$i])) {
-                    $matrixResult[$i] = [];
-                }
-
-
-                $regionToCompare = $this->getRegionFromImage($i, $j);
-
-                $regionToCompare->setImagePage(0, 0, 0, 0);
-
-                if (self::DEBUG) {
-                    $regionToCompare->writeImage($this->debugFolder . $i . '-' . $j . '.PNG');
-                }
-
-                $imageCompared = $regionToCompare->compareImages($imageToCompare, Imagick::METRIC_ROOTMEANSQUAREDERROR);
-
-                $matrixResult[$i][$j] = $imageCompared[1];
-
-                $regionToCompare->clear();
-            }
-        }
-
-        $imageToCompare->clear();
-
-        return $matrixResult;
-    }
-
-
     public function getMarksFromPaths($paths)
     {
         // create reference block pattern
