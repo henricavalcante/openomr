@@ -1,6 +1,7 @@
 <?php
 namespace OpenOMR;
 
+use OpenOMR\Exception;
 use Imagick;
 use ImagickPixel;
 
@@ -24,6 +25,10 @@ class OpenOMR
 
     public function __construct($path)
     {
+        if (!extension_loaded('imagick')) {
+            throw new Exception\ImagickExtensionNotFoundException('Imagick extension is not loaded.');
+        }
+
         $this->img = new Imagick();
         $this->img->readImage($path);
 

@@ -1,8 +1,9 @@
 <?php
 
 require("../src/OpenOMR.php");
+require("../src/Exception/ImagickExtensionNotFoundException.php");
 
-	$omr = \OpenOMR\OpenOMR::getInstance('openomr.jpg');
+	$omr = new \OpenOMR\OpenOMR('openomr.jpg');
 
 	$pathMarks = [
 		['field' => 'id','marks' =>[[19, 29, 1],[20, 29, 2],[21, 29, 3],[22, 29, 4],[23, 29, 5],[24, 29, 6],[25, 29, 7],[26, 29, 8],[27, 29, 9],[28, 29, 0],]],
@@ -120,8 +121,6 @@ require("../src/OpenOMR.php");
 	];
 	
 	$result = $omr->getMarksFromPaths($pathMarks);
-
-	//$result = $omr->getMatrixFromImage();
 	
 	print_r($result);
 	

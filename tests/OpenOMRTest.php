@@ -1,5 +1,6 @@
 <?php
 require("src/OpenOMR.php");
+require("src/Exception/ImagickExtensionNotFoundException.php");
 
 class OpenOMRTest extends PHPUnit_Framework_TestCase
 {
