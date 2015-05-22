@@ -22,7 +22,7 @@ class OpenOMR
     private $imgCelCompareSizeW;
     private $imgCelCompareSizeH;
 
-    private function __construct($path)
+    public function __construct($path)
     {
 
         //initialize object
@@ -47,17 +47,6 @@ class OpenOMR
             $this->img->writeImage($this->debugFolder . 'removeEdges.PNG');
         }
     }
-
-    public static function getInstance($path)
-    {
-
-        if (!isset($path)) {
-            throw new Exception('Please inform the paths of the marks.');
-        }
-
-        return new self($path);
-    }
-
 
     private function readImage($path)
     {

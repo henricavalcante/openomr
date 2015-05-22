@@ -5,7 +5,8 @@ class OpenOMRTest extends PHPUnit_Framework_TestCase
 {
     public function testIfImgCanBeRead()
     {
-        $omr = \OpenOMR\OpenOMR::getInstance('example/openomr.jpg');
+        $omr = new \OpenOMR\OpenOMR('example/openomr.jpg');
+
         $pathMarks = [
             [
                 'field' => 'id',
