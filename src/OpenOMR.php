@@ -1,4 +1,5 @@
 <?php
+namespace OpenOMR;
 
 class OpenOMR
 {
