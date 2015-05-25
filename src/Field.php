@@ -16,7 +16,7 @@ class Field
 
     public function setMark(Mark $mark)
     {
-        $this->marks[] = [$mark->getX(), $mark->getY(), $mark->getValue()];
+        $this->marks[] = $mark;
     }
 
     public function getIdentifier()
