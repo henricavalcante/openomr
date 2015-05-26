@@ -10,4 +10,5 @@ interface PaperSheetInterface
     public function setField(Field $field);
     public function getSource();
     public function getMatrixLength();
+    public function getFields();
 }
