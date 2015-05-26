@@ -6,7 +6,7 @@ use Imagick;
 use ImagickPixel;
 use ImagickException;
 
-class OpenOMR
+class Reader
 {
     const DEBUG = 0;
     const ERROR_MARGIN = 0.5;
