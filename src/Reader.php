@@ -4,85 +4,37 @@ namespace OpenOMR;
 use OpenOMR\Exception;
 use Imagick;
 use ImagickPixel;
-use ImagickException;
 
 class Reader
 {
-    const DEBUG = 0;
-    const ERROR_MARGIN = 0.5;
-
-    private $debugFolder;
-
-    private $img;
     private $imgSizeW;
     private $imgSizeH;
     private $imgCellSizeW;
     private $imgCellSizeH;
     private $imgCellCompareSizeW;
     private $imgCellCompareSizeH;
-    private $imgCellOffset;
-    private $matrixXLength;
-    private $matrixYLength;
 
-    public function __construct($imgPath, $matrixXLength = null, $matrixYLength = null, $imgCellOffset = null)
+    private $paperSheet;
+    private $image;
+    private $errorMargin = 0.5;
+
+    public function __construct(PaperSheetInterface $paperSheet)
     {
         if (!extension_loaded('imagick')) {
             throw new Exception\ImagickExtensionNotFoundException('Imagick extension is not loaded.');
         }
 
-        $this->createImageFromPath($imgPath);
-
-        $this->setMatrixXLength($matrixXLength);
-        $this->setMatrixYLength($matrixYLength);
-        $this->setImgCellOffset($imgCellOffset);
+        $this->paperSheet = $paperSheet;
+        $this->image = new ImageImagick();
+        $this->image->readImageFromFilename($this->paperSheet->getSource());
     }
 
-    private function createImageFromPath($imgPath)
+    public function getResults()
     {
-        try {
-            $this->img = new Imagick();
-            $this->img->readImage($imgPath);
-        } catch (ImagickException $e) {
-            throw new Exception\InvalidImgPathException('It was not possible to read the image from path informed.');
-        }
-    }
+        $this->image->adjustImage();
+        $this->image->removeEdges();
 
-    public function setMatrixYLength($length)
-    {
-        $this->matrixYLength = $length;
-    }
-
-    public function setMatrixXLength($length)
-    {
-        $this->matrixXLength = $length;
-    }
-
-    public function setImgCellOffset($offset)
-    {
-        $this->imgCellOffset = $offset;
-    }
-
-    public function getMarksFromPaths($paths)
-    {
-        if (self::DEBUG) {
-            $this->debugFolder = getdate()[0] . '/';
-            mkdir($this->debugFolder);
-        }
-
-        $this->removeColors();
-        if (self::DEBUG) {
-            $this->img->writeImage($this->debugFolder . 'removeColors.PNG');
-        }
-
-        $this->adjustImage();
-        if (self::DEBUG) {
-            $this->img->writeImage($this->debugFolder . 'adjustImage.PNG');
-        }
-
-        $this->removeEdges();
-        if (self::DEBUG) {
-            $this->img->writeImage($this->debugFolder . 'removeEdges.PNG');
-        }
+        $this->calculateSizes();
 
         // create reference block pattern
         $imageToCompare = new Imagick();
@@ -90,56 +42,48 @@ class Reader
 
         $result = [];
 
-        foreach ($paths as $path) {
+        foreach ($this->paperSheet->getFields() as $field) {
 
-            if (!isset($result[$path['field']])) {
-                $result[$path['field']] = ['status' => 0, 'value' => '', 'error_margin' => 1];
-            } else {
-                if ($result[$path['field']]['status'] == 3) {
-                    //if marked with wrong dont search next path
-                    continue;
-                } else {
-                    if ($result[$path['field']]['status'] == 2) {
-                        //if a next char from field reset status
-                        $result[$path['field']]['status'] = 0;
-                    }
-                }
+            if (!isset($result[$field->getIdentifier()])) {
+                $result[$field->getIdentifier()] = ['status' => 0, 'value' => '', 'error_margin' => 1];
             }
 
-            foreach ($path['marks'] as $mark) {
+            //if marked with wrong dont search next path
+            if ($result[$field->getIdentifier()]['status'] === 3) {
+                continue;
+            }
 
-                if ($result[$path['field']]['status'] == 0) {
-                    $result[$path['field']]['status'] = 1;
+            //if a next char from field reset status
+            if ($result[$field->getIdentifier()]['status'] === 2) {
+                $result[$field->getIdentifier()]['status'] = 0;
+            }
+
+            foreach ($field->getMarks() as $mark) {
+                if ($result[$field->getIdentifier()]['status'] === 0) {
+                    $result[$field->getIdentifier()]['status'] = 1;
                 }
 
-                $regionToCompare = $this->getRegionFromImage($mark[0], $mark[1]);
-
-                $regionToCompare->setImagePage(0, 0, 0, 0);
-
-                if (self::DEBUG) {
-                    $regionToCompare->writeImage($this->debugFolder . $mark[0] . '-' . $mark[1] . '.PNG');
-                }
+                $regionToCompare = $this->getRegionFromImage($mark->getX(), $mark->getY());
 
                 $differenceBetweenImages = $regionToCompare->compareImages($imageToCompare,
                     Imagick::METRIC_ROOTMEANSQUAREDERROR);
 
-                if ($differenceBetweenImages[1] < $result[$path['field']]['error_margin']) {
-                    $result[$path['field']]['error_margin'] = $differenceBetweenImages[1];
+                if ($differenceBetweenImages[1] < $result[$field->getIdentifier()]['error_margin']) {
+                    $result[$field->getIdentifier()]['error_margin'] = $differenceBetweenImages[1];
                 }
 
-                if ($differenceBetweenImages[1] < self::ERROR_MARGIN) {
+                if ($differenceBetweenImages[1] < $this->errorMargin) {
                     //cade doesn't exists difference between black square and region marked concatenate the value
-                    $result[$path['field']]['value'] .= $mark[2];
+                    $result[$field->getIdentifier()]['value'] .= $mark->getValue();
 
-                    if ($result[$path['field']]['status'] == 2) {
-                        $result[$path['field']]['status'] = 3;
+                    if ($result[$field->getIdentifier()]['status'] === 2) {
+                        $result[$field->getIdentifier()]['status'] = 3;
                     } else {
-                        $result[$path['field']]['status'] = 2;
+                        $result[$field->getIdentifier()]['status'] = 2;
                     }
-                };
+                }
 
                 $regionToCompare->clear();
-
             }
         }
 
@@ -148,70 +92,30 @@ class Reader
         return $result;
     }
 
-    private function identifyImage()
-    {
-        return $this->img->identifyImage();
-    }
-
-    private function removeColors()
-    {
-        if ($this->identifyImage()['type'] === 'TrueColor') {
-            $this->img->separateImageChannel(Imagick::CHANNEL_RED); // remove red from image
-        } else {
-            $this->img->modulateImage(100, 0, 100); // desaturate
-        }
-    }
-
-    private function adjustImage()
-    {
-        $this->img->normalizeImage(Imagick::CHANNEL_ALL);
-        $this->img->enhanceImage();
-        $this->img->despeckleImage();
-        $this->img->blackthresholdImage('#808080');
-        $this->img->whitethresholdImage('#808080');
-    }
-
-    private function removeEdges()
-    {
-        //remove edges and possible skew from image
-        $this->img->trimImage(85);
-        $this->img->deskewImage(15);
-        $this->img->trimImage(85);
-        $this->img->setImagePage(0, 0, 0, 0);
-
-        $this->calculateSizes();
-    }
-
     private function calculateSizes()
     {
-        $imageGeometryInfo = $this->identifyImage()['geometry'];
+        $imageGeometryInfo = $this->image->identifyImage()['geometry'];
         $this->imgSizeW = $imageGeometryInfo['width'];
         $this->imgSizeH = $imageGeometryInfo['height'];
 
-        $this->imgCellSizeW = $this->imgSizeW / $this->matrixXLength;
-        $this->imgCellSizeH = $this->imgSizeH / $this->matrixYLength;
+        $this->imgCellSizeW = $this->imgSizeW / $this->paperSheet->getMatrixLength()['x'];
+        $this->imgCellSizeH = $this->imgSizeH / $this->paperSheet->getMatrixLength()['y'];
 
-        $this->imgCellCompareSizeW = $this->imgCellSizeW - ($this->imgCellOffset * 2);
-        $this->imgCellCompareSizeH = $this->imgCellSizeH - ($this->imgCellOffset * 2);
-
-        if (self::DEBUG) {
-            print_r($this);
-        }
-
+        $this->imgCellCompareSizeW = $this->imgCellSizeW - (4 * 2);
+        $this->imgCellCompareSizeH = $this->imgCellSizeH - (4 * 2);
     }
 
     private function getRegionFromImage($row, $col)
     {
         $sizeW = $this->imgCellCompareSizeW;
         $sizeH = $this->imgCellCompareSizeH;
-        $pX = ($col * $this->imgCellSizeW) + $this->imgCellOffset;
-        $pY = ($row * $this->imgCellSizeW) + $this->imgCellOffset;
+        $pX = ($col * $this->imgCellSizeW) + 4;
+        $pY = ($row * $this->imgCellSizeW) + 4;
 
-        if (self::DEBUG) {
-            echo "\n" . $col . " - " . $row . " - " . $pX . " - " . $pY;
-        }
+        $image = $this->image->getImageRegion($sizeW, $sizeH, $pX, $pY);
+        $image->setImagePage(0, 0, 0, 0);
 
-        return $this->img->getImageRegion($sizeW, $sizeH, $pX, $pY);
+        return $image;
     }
 
 }
