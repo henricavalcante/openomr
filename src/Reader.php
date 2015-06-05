@@ -7,8 +7,6 @@ use ImagickPixel;
 
 class Reader
 {
-    private $imgSizeW;
-    private $imgSizeH;
     private $imgCellSizeW;
     private $imgCellSizeH;
     private $imgCellCompareSizeW;
@@ -93,11 +91,9 @@ class Reader
     private function calculateSizes()
     {
         $imageGeometryInfo = $this->image->identifyImage()['geometry'];
-        $this->imgSizeW = $imageGeometryInfo['width'];
-        $this->imgSizeH = $imageGeometryInfo['height'];
 
-        $this->imgCellSizeW = $this->imgSizeW / $this->paperSheet->getMatrixLength()['x'];
-        $this->imgCellSizeH = $this->imgSizeH / $this->paperSheet->getMatrixLength()['y'];
+        $this->imgCellSizeW = $imageGeometryInfo['width'] / $this->paperSheet->getMatrixLength()['x'];
+        $this->imgCellSizeH = $imageGeometryInfo['height'] / $this->paperSheet->getMatrixLength()['y'];
 
         $this->imgCellCompareSizeW = $this->imgCellSizeW - (4 * 2);
         $this->imgCellCompareSizeH = $this->imgCellSizeH - (4 * 2);
