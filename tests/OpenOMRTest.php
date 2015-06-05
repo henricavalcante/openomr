@@ -3,9 +3,9 @@ namespace OpenOMR;
 
 class OpenOMRTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIfImgCanBeRead()
+    public function testGetPaperSheetAnswers()
     {
-        $paper = new PaperSheet(__DIR__ . '/../example/openomr.jpg', [38, 54]);
+        $paper = new \OpenOMR\PaperSheet(__DIR__ . '/../example/openomr.jpg', [38, 54]);
 
         for ($i = 29; $i <= 35; $i++) {
             $field = new \OpenOMR\Field('id');
