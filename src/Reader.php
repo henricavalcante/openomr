@@ -32,8 +32,6 @@ class Reader
     public function getResults()
     {
         $this->image->adjustImage();
-        $this->image->removeEdges();
-
         $this->calculateSizes();
 
         // create reference block pattern

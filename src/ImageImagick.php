@@ -19,6 +19,7 @@ class ImageImagick extends Imagick
     {
         $this->enhanceImageQuality();
         $this->turnImageIntoBlackAndWhite();
+        $this->removeEdges();
     }
 
     protected function enhanceImageQuality()
@@ -34,7 +35,7 @@ class ImageImagick extends Imagick
         $this->whiteThresholdImage('#808080');
     }
 
-    public function removeEdges()
+    protected function removeEdges()
     {
         //remove edges and possible skew from image
         $this->trimImage(85);
