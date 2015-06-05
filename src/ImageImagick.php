@@ -10,17 +10,26 @@ class ImageImagick extends Imagick
     {
         try {
             $this->readImage($filename);
-            return $this;
         } catch (ImagickException $e) {
-            throw new Exception\InvalidImgPathException('It was not possible to read the image from path informed.');
+            throw new Exception\InvalidImagePathException('It was not possible to read the image from path informed.');
         }
     }
 
     public function adjustImage()
     {
+        $this->enhanceImageQuality();
+        $this->turnImageIntoBlackAndWhite();
+    }
+
+    protected function enhanceImageQuality()
+    {
         $this->normalizeImage();
         $this->enhanceImage();
         $this->despeckleImage();
+    }
+
+    protected function turnImageIntoBlackAndWhite()
+    {
         $this->blackThresholdImage('#808080');
         $this->whiteThresholdImage('#808080');
     }
