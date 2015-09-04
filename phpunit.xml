@@ -1,7 +1,9 @@
-<phpunit>
+<phpunit
+        bootstrap="vendor/autoload.php"
+        colors="true">
   <testsuites>
     <testsuite name="openomr">
-      <directory>tests</directory>
+      <directory suffix="Test.php">tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>
