@@ -2,81 +2,70 @@
 namespace OpenOMR;
 
 use OpenOMR\Exception;
+use OpenOMR\PaperSheet\PaperSheet;
 use Imagick;
 use ImagickPixel;
 
 class Reader
 {
-    private $imgCellSizeW;
-    private $imgCellSizeH;
-    private $imgCellCompareSizeW;
-    private $imgCellCompareSizeH;
-
     private $paperSheet;
-    private $image;
-    private $errorMargin = 0.5;
+    private $scannedImage;
+    private $errorMargin;
 
-    public function __construct(PaperSheetInterface $paperSheet)
+    public function __construct($imageFile, PaperSheet $paperSheet, $edgeDislocation = 0, $errorMargin = 0.5)
     {
         if (!extension_loaded('imagick')) {
             throw new Exception\ImagickExtensionNotFoundException('Imagick extension is not loaded.');
         }
 
         $this->paperSheet = $paperSheet;
-        $this->image = new ImageImagick();
-        $this->image->readImageFromFilename($this->paperSheet->getSource());
+        $this->scannedImage = $this->createScannedImage($imageFile, $this->paperSheet->getMatrixLength(), $edgeDislocation);
+        $this->errorMargin = $errorMargin;
     }
 
     public function getResults()
     {
-        $this->image->adjustImage();
-        $this->calculateSizes();
-
-        // create reference block pattern
-        $imageToCompare = new Imagick();
-        $imageToCompare->newImage($this->imgCellCompareSizeW, $this->imgCellCompareSizeH, new ImagickPixel('black'));
+        $imageToCompare = $this->createImageWithBlackBackground($this->scannedImage->getCellWidthForComparison(), $this->scannedImage->getCellHeightForComparison());
 
         $result = [];
 
         foreach ($this->paperSheet->getFields() as $field) {
-
             if (!isset($result[$field->getIdentifier()])) {
-                $result[$field->getIdentifier()] = ['status' => 0, 'value' => '', 'error_margin' => 1];
+                $result[$field->getIdentifier()] = ['status' => ReadingStatus::INITIAL, 'value' => '', 'error_margin' => 1];
             }
 
-            //if marked with wrong dont search next path
-            if ($result[$field->getIdentifier()]['status'] === 3) {
+            $fieldStatus = &$result[$field->getIdentifier()]['status'];
+            $fieldErrorMargin = &$result[$field->getIdentifier()]['error_margin'];
+
+            //if marked with wrong don't search next path
+            if ($fieldStatus === ReadingStatus::FAILURE) {
                 continue;
             }
 
             //if a next char from field reset status
-            if ($result[$field->getIdentifier()]['status'] === 2) {
-                $result[$field->getIdentifier()]['status'] = 0;
+            if ($fieldStatus === ReadingStatus::SUCCESS) {
+                $fieldStatus = ReadingStatus::INITIAL;
             }
 
             foreach ($field->getMarks() as $mark) {
-                if ($result[$field->getIdentifier()]['status'] === 0) {
-                    $result[$field->getIdentifier()]['status'] = 1;
+                if ($fieldStatus === ReadingStatus::INITIAL) {
+                    $fieldStatus = ReadingStatus::BLANK;
                 }
 
-                $regionToCompare = $this->getRegionFromImage($mark->getX(), $mark->getY());
+                $regionToCompare = $this->scannedImage->extractRegion($mark->getX(), $mark->getY());
 
-                $differenceBetweenImages = $regionToCompare->compareImages($imageToCompare,
-                    Imagick::METRIC_ROOTMEANSQUAREDERROR);
+                $differenceBetweenImages = $regionToCompare->compareImages($imageToCompare, Imagick::METRIC_ROOTMEANSQUAREDERROR);
+                $metricResult = $differenceBetweenImages[1];
 
-                if ($differenceBetweenImages[1] < $result[$field->getIdentifier()]['error_margin']) {
-                    $result[$field->getIdentifier()]['error_margin'] = $differenceBetweenImages[1];
+                if ($metricResult < $fieldErrorMargin) {
+                    $fieldErrorMargin = $metricResult;
                 }
 
-                if ($differenceBetweenImages[1] < $this->errorMargin) {
-                    //cade doesn't exists difference between black square and region marked concatenate the value
+                if ($metricResult <= $this->errorMargin) {
+                    //code doesn't exists difference between black square and region marked concatenate the value
                     $result[$field->getIdentifier()]['value'] .= $mark->getValue();
 
-                    if ($result[$field->getIdentifier()]['status'] === 2) {
-                        $result[$field->getIdentifier()]['status'] = 3;
-                    } else {
-                        $result[$field->getIdentifier()]['status'] = 2;
-                    }
+                    $fieldStatus = ($fieldStatus === ReadingStatus::SUCCESS) ? ReadingStatus::FAILURE : ReadingStatus::SUCCESS;
                 }
 
                 $regionToCompare->clear();
@@ -88,28 +77,16 @@ class Reader
         return $result;
     }
 
-    private function calculateSizes()
+    protected function createScannedImage($imageFile, array $matrixLength, $edgeDislocation)
     {
-        $imageGeometryInfo = $this->image->identifyImage()['geometry'];
-
-        $this->imgCellSizeW = $imageGeometryInfo['width'] / $this->paperSheet->getMatrixLength()['x'];
-        $this->imgCellSizeH = $imageGeometryInfo['height'] / $this->paperSheet->getMatrixLength()['y'];
-
-        $this->imgCellCompareSizeW = $this->imgCellSizeW - (4 * 2);
-        $this->imgCellCompareSizeH = $this->imgCellSizeH - (4 * 2);
+        return new ScannedImage($imageFile, $matrixLength, $edgeDislocation);
     }
 
-    private function getRegionFromImage($row, $col)
+    protected function createImageWithBlackBackground($cols, $rows)
     {
-        $sizeW = $this->imgCellCompareSizeW;
-        $sizeH = $this->imgCellCompareSizeH;
-        $pX = ($col * $this->imgCellSizeW) + 4;
-        $pY = ($row * $this->imgCellSizeW) + 4;
-
-        $image = $this->image->getImageRegion($sizeW, $sizeH, $pX, $pY);
-        $image->setImagePage(0, 0, 0, 0);
+        $image = new Imagick();
+        $image->newImage($cols, $rows, new ImagickPixel('black'));
 
         return $image;
     }
-
 }
