@@ -127,10 +127,10 @@ class OpenOMRTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('B', $result['07']['value']);
         $this->assertEquals('D', $result['85']['value']);
 
-        $this->assertEquals(ReadingStatus::SUCCESS, $result['01']['status']);
-        $this->assertEquals(ReadingStatus::SUCCESS, $result['85']['status']);
-        $this->assertEquals(ReadingStatus::FAILURE, $result['65']['status']);
-        $this->assertEquals(ReadingStatus::BLANK, $result['82']['status']);
-        $this->assertEquals(ReadingStatus::BLANK, $result['57']['status']);
+        $this->assertEquals(ReadingStatus::SUCCESS, $result['01']['status'], 'check if option 01 is success');
+        $this->assertEquals(ReadingStatus::SUCCESS, $result['85']['status'], 'check if option 85 is success');
+        $this->assertEquals(ReadingStatus::FAILURE, $result['65']['status'], 'check if option 65 is failure');
+        $this->assertEquals(ReadingStatus::BLANK, $result['82']['status'], 'check if option 82 is blank');
+        $this->assertEquals(ReadingStatus::BLANK, $result['57']['status'], 'check if option 57 is blank');
     }
 }
