@@ -1,5 +1,5 @@
 <?php
-namespace OpenOMR;
+namespace OpenOMR\PaperSheet;
 
 class Mark
 {

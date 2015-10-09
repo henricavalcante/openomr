@@ -5,4 +5,4 @@
 
 *I'm working on it, don't take my changes seriously by now.*
 
-A PHP class to extract values from image scanned like optical mark recognition (OMR)
+A PHP class to extract values from image scanned like optical mark recognition (OMR).

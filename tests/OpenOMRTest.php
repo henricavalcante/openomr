@@ -1,105 +1,136 @@
 <?php
 namespace OpenOMR;
 
+use OpenOMR\PaperSheet\PaperSheet;
+use OpenOMR\PaperSheet\Mark;
+use OpenOMR\PaperSheet\Field;
+
 class OpenOMRTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetPaperSheetAnswers()
+    protected $paperSheet;
+
+    protected function setUp()
     {
-        $paper = new \OpenOMR\PaperSheet(__DIR__ . '/../example/openomr.jpg', [38, 54]);
+        $this->paperSheet = new PaperSheet(38, 54);
 
         for ($i = 29; $i <= 35; $i++) {
-            $field = new \OpenOMR\Field('id');
-            $field->setMark(new \OpenOMR\Mark(19, $i, 1));
-            $field->setMark(new \OpenOMR\Mark(20, $i, 2));
-            $field->setMark(new \OpenOMR\Mark(21, $i, 3));
-            $field->setMark(new \OpenOMR\Mark(22, $i, 4));
-            $field->setMark(new \OpenOMR\Mark(23, $i, 5));
-            $field->setMark(new \OpenOMR\Mark(24, $i, 6));
-            $field->setMark(new \OpenOMR\Mark(25, $i, 7));
-            $field->setMark(new \OpenOMR\Mark(26, $i, 8));
-            $field->setMark(new \OpenOMR\Mark(27, $i, 9));
-            $field->setMark(new \OpenOMR\Mark(28, $i, 0));
-            $paper->setField($field);
+            $field = new Field('id');
+            $field->addMark(new Mark(19, $i, 1));
+            $field->addMark(new Mark(20, $i, 2));
+            $field->addMark(new Mark(21, $i, 3));
+            $field->addMark(new Mark(22, $i, 4));
+            $field->addMark(new Mark(23, $i, 5));
+            $field->addMark(new Mark(24, $i, 6));
+            $field->addMark(new Mark(25, $i, 7));
+            $field->addMark(new Mark(26, $i, 8));
+            $field->addMark(new Mark(27, $i, 9));
+            $field->addMark(new Mark(28, $i, 0));
+            $this->paperSheet->addField($field);
         }
 
         $fieldId = 1;
 
         for ($i = 31; $i <= 50; $i++) {
-            $field = new \OpenOMR\Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
-            $field->setMark(new \OpenOMR\Mark($i, 3, 'A'));
-            $field->setMark(new \OpenOMR\Mark($i, 4, 'B'));
-            $field->setMark(new \OpenOMR\Mark($i, 5, 'C'));
-            $field->setMark(new \OpenOMR\Mark($i, 6, 'D'));
-            $field->setMark(new \OpenOMR\Mark($i, 7, 'E'));
-            $paper->setField($field);
+            $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
+            $field->addMark(new Mark($i, 3, 'A'));
+            $field->addMark(new Mark($i, 4, 'B'));
+            $field->addMark(new Mark($i, 5, 'C'));
+            $field->addMark(new Mark($i, 6, 'D'));
+            $field->addMark(new Mark($i, 7, 'E'));
+            $this->paperSheet->addField($field);
 
             $fieldId++;
         }
 
         for ($i = 31; $i <= 50; $i++) {
-            $field = new \OpenOMR\Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
-            $field->setMark(new \OpenOMR\Mark($i, 10, 'A'));
-            $field->setMark(new \OpenOMR\Mark($i, 11, 'B'));
-            $field->setMark(new \OpenOMR\Mark($i, 12, 'C'));
-            $field->setMark(new \OpenOMR\Mark($i, 13, 'D'));
-            $field->setMark(new \OpenOMR\Mark($i, 14, 'E'));
-            $paper->setField($field);
+            $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
+            $field->addMark(new Mark($i, 10, 'A'));
+            $field->addMark(new Mark($i, 11, 'B'));
+            $field->addMark(new Mark($i, 12, 'C'));
+            $field->addMark(new Mark($i, 13, 'D'));
+            $field->addMark(new Mark($i, 14, 'E'));
+            $this->paperSheet->addField($field);
 
             $fieldId++;
         }
 
         for ($i = 31; $i <= 50; $i++) {
-            $field = new \OpenOMR\Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
-            $field->setMark(new \OpenOMR\Mark($i, 17, 'A'));
-            $field->setMark(new \OpenOMR\Mark($i, 18, 'B'));
-            $field->setMark(new \OpenOMR\Mark($i, 19, 'C'));
-            $field->setMark(new \OpenOMR\Mark($i, 20, 'D'));
-            $field->setMark(new \OpenOMR\Mark($i, 21, 'E'));
-            $paper->setField($field);
+            $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
+            $field->addMark(new Mark($i, 17, 'A'));
+            $field->addMark(new Mark($i, 18, 'B'));
+            $field->addMark(new Mark($i, 19, 'C'));
+            $field->addMark(new Mark($i, 20, 'D'));
+            $field->addMark(new Mark($i, 21, 'E'));
+            $this->paperSheet->addField($field);
 
             $fieldId++;
         }
 
 
         for ($i = 31; $i <= 50; $i++) {
-            $field = new \OpenOMR\Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
-            $field->setMark(new \OpenOMR\Mark($i, 24, 'A'));
-            $field->setMark(new \OpenOMR\Mark($i, 25, 'B'));
-            $field->setMark(new \OpenOMR\Mark($i, 26, 'C'));
-            $field->setMark(new \OpenOMR\Mark($i, 27, 'D'));
-            $field->setMark(new \OpenOMR\Mark($i, 28, 'E'));
-            $paper->setField($field);
+            $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
+            $field->addMark(new Mark($i, 24, 'A'));
+            $field->addMark(new Mark($i, 25, 'B'));
+            $field->addMark(new Mark($i, 26, 'C'));
+            $field->addMark(new Mark($i, 27, 'D'));
+            $field->addMark(new Mark($i, 28, 'E'));
+            $this->paperSheet->addField($field);
 
             $fieldId++;
         }
 
         for ($i = 31; $i <= 50; $i++) {
-            $field = new \OpenOMR\Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
-            $field->setMark(new \OpenOMR\Mark($i, 31, 'A'));
-            $field->setMark(new \OpenOMR\Mark($i, 32, 'B'));
-            $field->setMark(new \OpenOMR\Mark($i, 33, 'C'));
-            $field->setMark(new \OpenOMR\Mark($i, 34, 'D'));
-            $field->setMark(new \OpenOMR\Mark($i, 35, 'E'));
-            $paper->setField($field);
+            $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
+            $field->addMark(new Mark($i, 31, 'A'));
+            $field->addMark(new Mark($i, 32, 'B'));
+            $field->addMark(new Mark($i, 33, 'C'));
+            $field->addMark(new Mark($i, 34, 'D'));
+            $field->addMark(new Mark($i, 35, 'E'));
+            $this->paperSheet->addField($field);
 
             $fieldId++;
         }
+    }
 
-        $omr = new Reader($paper);
+    public function testImageWithGoodMarks()
+    {
+        $omr = new Reader(__DIR__ . '/../example/openomr.jpg', $this->paperSheet, 4);
         $result = $omr->getResults();
 
         $this->assertEquals($result['id']['value'], '132');
-        $this->assertEquals($result['01']['value'], 'A');
-        $this->assertEquals($result['02']['value'], 'C');
-        $this->assertEquals($result['03']['value'], 'C');
-        $this->assertEquals($result['04']['value'], 'D');
-        $this->assertEquals($result['05']['value'], 'B');
-        $this->assertEquals($result['06']['value'], 'C');
-        $this->assertEquals($result['07']['value'], 'A');
-        $this->assertEquals($result['08']['value'], 'E');
-        $this->assertEquals($result['09']['value'], 'E');
-        $this->assertEquals($result['10']['value'], 'B');
-        $this->assertEquals($result['11']['value'], 'A');
-        $this->assertEquals($result['12']['value'], 'D');
+        $this->assertEquals('A', $result['01']['value']);
+        $this->assertEquals('C', $result['02']['value']);
+        $this->assertEquals('C', $result['03']['value']);
+        $this->assertEquals('D', $result['04']['value']);
+        $this->assertEquals('B', $result['05']['value']);
+        $this->assertEquals('C', $result['06']['value']);
+        $this->assertEquals('A', $result['07']['value']);
+        $this->assertEquals('E', $result['08']['value']);
+        $this->assertEquals('E', $result['09']['value']);
+        $this->assertEquals('B', $result['10']['value']);
+        $this->assertEquals('A', $result['11']['value']);
+
+    }
+
+    public function testImageWithBadMarks()
+    {
+        $omr = new Reader(__DIR__ . '/../example/openomr2.jpg', $this->paperSheet, 4);
+        $result = $omr->getResults();
+
+        $this->assertEquals($result['id']['value'], '1234560');
+        $this->assertEquals('A', $result['01']['value']);
+        $this->assertEquals('C', $result['02']['value']);
+        $this->assertEquals('E', $result['03']['value']);
+        $this->assertEquals('B', $result['04']['value']);
+        $this->assertEquals('D', $result['05']['value']);
+        $this->assertEquals('C', $result['06']['value']);
+        $this->assertEquals('B', $result['07']['value']);
+        $this->assertEquals('D', $result['85']['value']);
+
+        $this->assertEquals(ReadingStatus::SUCCESS, $result['01']['status'], 'check if option 01 is success');
+        $this->assertEquals(ReadingStatus::SUCCESS, $result['85']['status'], 'check if option 85 is success');
+        $this->assertEquals(ReadingStatus::FAILURE, $result['65']['status'], 'check if option 65 is failure');
+        $this->assertEquals(ReadingStatus::BLANK, $result['82']['status'], 'check if option 82 is blank');
+        $this->assertEquals(ReadingStatus::BLANK, $result['57']['status'], 'check if option 57 is blank');
     }
 }

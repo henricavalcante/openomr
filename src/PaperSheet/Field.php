@@ -1,20 +1,17 @@
 <?php
-namespace OpenOMR;
-
-use OpenOMR\Mark;
+namespace OpenOMR\PaperSheet;
 
 class Field
 {
     private $identifier;
-    private $marks;
+    private $marks = [];
 
     public function __construct($identifier)
     {
         $this->identifier = $identifier;
-        $this->marks = [];
     }
 
-    public function setMark(Mark $mark)
+    public function addMark(Mark $mark)
     {
         $this->marks[] = $mark;
     }
