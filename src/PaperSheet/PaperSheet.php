@@ -1,7 +1,10 @@
 <?php
 namespace OpenOMR\PaperSheet;
 
-class PaperSheet
+use IteratorAggregate;
+use ArrayIterator;
+
+class PaperSheet implements IteratorAggregate
 {
     private $matrixLength = [];
     private $fields = [];
@@ -24,5 +27,10 @@ class PaperSheet
     public function getFields()
     {
         return $this->fields;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->fields);
     }
 }

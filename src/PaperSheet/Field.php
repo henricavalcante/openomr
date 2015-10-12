@@ -1,7 +1,10 @@
 <?php
 namespace OpenOMR\PaperSheet;
 
-class Field
+use IteratorAggregate;
+use ArrayIterator;
+
+class Field implements IteratorAggregate
 {
     private $identifier;
     private $marks = [];
@@ -24,5 +27,10 @@ class Field
     public function getMarks()
     {
         return $this->marks;
+    }
+
+    public function getIterator()
+    {
+        return new ArrayIterator($this->marks);
     }
 }
