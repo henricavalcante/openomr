@@ -1,7 +1,7 @@
 <?php
 namespace OpenOMR;
 
-class ReadingStatus
+final class ReadingStatus
 {
     const INITIAL = 0;
     const BLANK = 1;
