@@ -1,9 +1,10 @@
 <?php
-use \OpenOMR\PaperSheet\PaperSheet;
-use \OpenOMR\PaperSheet\Field;
-use \OpenOMR\PaperSheet\Mark;
-
 require '../vendor/autoload.php';
+
+use OpenOMR\PaperSheet\PaperSheet;
+use OpenOMR\PaperSheet\Field;
+use OpenOMR\PaperSheet\Mark;
+use OpenOMR\Reader\Reader;
 
 $paper = new PaperSheet(38, 54);
 
@@ -84,5 +85,5 @@ for ($i = 31; $i <= 50; $i++) {
     $fieldId++;
 }
 
-$reader = new \OpenOMR\Reader('openomr.jpg', $paper, 4);
+$reader = new Reader('openomr.jpg', $paper, 4);
 var_dump($reader->getResults());

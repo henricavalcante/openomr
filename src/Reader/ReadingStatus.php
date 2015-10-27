@@ -1,5 +1,5 @@
 <?php
-namespace OpenOMR;
+namespace OpenOMR\Reader;
 
 final class ReadingStatus
 {

@@ -4,6 +4,8 @@ namespace OpenOMR;
 use OpenOMR\PaperSheet\PaperSheet;
 use OpenOMR\PaperSheet\Mark;
 use OpenOMR\PaperSheet\Field;
+use OpenOMR\Reader\Reader;
+use OpenOMR\Reader\ReadingStatus;
 
 class OpenOMRTest extends \PHPUnit_Framework_TestCase
 {

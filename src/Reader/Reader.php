@@ -1,5 +1,5 @@
 <?php
-namespace OpenOMR;
+namespace OpenOMR\Reader;
 
 use OpenOMR\Exception;
 use OpenOMR\PaperSheet\PaperSheet;
