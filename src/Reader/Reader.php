@@ -1,5 +1,5 @@
 <?php
-namespace OpenOMR;
+namespace OpenOMR\Reader;
 
 use OpenOMR\Exception;
 use OpenOMR\PaperSheet\PaperSheet;
@@ -29,7 +29,7 @@ class Reader
 
         $result = [];
 
-        foreach ($this->paperSheet->getFields() as $field) {
+        foreach ($this->paperSheet as $field) {
             if (!isset($result[$field->getIdentifier()])) {
                 $result[$field->getIdentifier()] = ['status' => ReadingStatus::INITIAL, 'value' => '', 'error_margin' => 1];
             }
@@ -47,7 +47,7 @@ class Reader
                 $fieldStatus = ReadingStatus::INITIAL;
             }
 
-            foreach ($field->getMarks() as $mark) {
+            foreach ($field as $mark) {
                 if ($fieldStatus === ReadingStatus::INITIAL) {
                     $fieldStatus = ReadingStatus::BLANK;
                 }
