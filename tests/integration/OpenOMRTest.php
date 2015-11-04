@@ -68,7 +68,6 @@ class OpenOMRTest extends \PHPUnit_Framework_TestCase
             $fieldId++;
         }
 
-
         for ($i = 31; $i <= 50; $i++) {
             $field = new Field(str_pad($fieldId, 2, '0', STR_PAD_LEFT));
             $field->addMark(new Mark($i, 24, 'A'));
@@ -96,7 +95,7 @@ class OpenOMRTest extends \PHPUnit_Framework_TestCase
 
     public function testImageWithGoodMarks()
     {
-        $omr = new Reader(__DIR__ . '/../example/openomr.jpg', $this->paperSheet, 4);
+        $omr = new Reader(__DIR__ . '/../_resources/openomr.jpg', $this->paperSheet, 4);
         $result = $omr->getResults();
 
         $this->assertEquals($result['id']['value'], '132');
@@ -116,7 +115,7 @@ class OpenOMRTest extends \PHPUnit_Framework_TestCase
 
     public function testImageWithBadMarks()
     {
-        $omr = new Reader(__DIR__ . '/../example/openomr2.jpg', $this->paperSheet, 4);
+        $omr = new Reader(__DIR__ . '/../_resources/openomr2.jpg', $this->paperSheet, 4);
         $result = $omr->getResults();
 
         $this->assertEquals($result['id']['value'], '1234560');
