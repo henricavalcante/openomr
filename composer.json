@@ -1,4 +1,5 @@
 {
+    "name": "henricavalcante/openomr",
     "require": {
         "php": ">=5.4"
     },
